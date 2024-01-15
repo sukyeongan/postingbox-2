@@ -18,13 +18,13 @@ def home():
    return render_template('index.html')
 
 @app.route('/memo', methods=['GET'])
-def listing():
+def read_articles():
     articles = list(db.articles.find({}, {'_id': False}))
     return jsonify({'all_articles':articles})
 
 ## API 역할을 하는 부분
 @app.route('/memo', methods=['POST'])
-def saving():
+def post_article():
     url_receive = request.form['url_give']
     comment_receive = request.form['comment_give']
 
