@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+        integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+
+    <!-- 구글폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Gugi&display=swap" rel="stylesheet">
+
+
+    <title>나혼자 만드는 메모장</title>
+
+    <style type="text/css">
+        * {
+            font-family: 'Gugi', sans-serif;
+        }
+
+        .wrap {
+            margin: auto;
+            width: 850px;
+        }
+
+        #post-box {
+            margin: 20px auto;
+            border: solid black;
+            border-radius: 8px;
+            padding: 50px;
+            width: 500px;
+            height: 300px;
+        }
+
+        .card-title {
+            font-weight: bold;
+            color: skyblue;
+        }
+
+        .card-comment {
+            font-weight: bold;
+            color: blue;
+        }
+
+        #post-box {
+            display: none;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            showArticles();
+        })
+
+        function openClose() {
+            let status = $('#post-box').css('display')
+            if (status == 'block') {
+                $('#post-box').hide();
+                $('#posting-box-btn').text('포스팅 박스 열기');
+            } else {
+                $('#post-box').show();
+                $('#posting-box-btn').text('포스팅 박스 닫기');
+            }
+        }
+
+        function showArticles() {
+
+            $.ajax({
+                type: "GET",
+                url: "/memo",
+                data: {},
+                success: function (response) {
+                    let articles = response['articles'];
+
+                    for(let i=0;i<articles.length;i++){
+                            let title=articles[i]['title'];
+                            let desc=articles[i]['desc'];
+                            let image=articles[i]['image'];
+                            let url=articles[i]['url'];
+                            let comment=articles[i]['comment'];
+
+                            let temp_html=`<div class="card">
+                            <img class="card-img-top"
+                                src="${image}"
+                                alt="Card image cap">
+                         <div class="card-body">
+                            <a target="_blank" href="${url}" class="card-title{title} ></a>
+                            <p class="card-text">${desc}</p>
+                            <p class="card-text comment">${comment}</p>
+                         </div>
+                        </div>`
+                            $('#cards-box').append(temp_html)
+                    }
+                }
+            })
+        }
+
+        function postArticle() {
+            let url = $('#url-post').val();
+            let comment = $('#comment-post').val();
+
+            $.ajax({
+                type: "POST",
+                url: "/memo",
+                data: { 'url_give': url, 'comment_give': comment },
+                success: function (response) {
+                    alert(response["mgs"]);
+                    window.location.reload();
+                }
+            })
+        }
+    </script>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="jumbotron">
+            <h1 class="display-4">나홀로 링크 메모장!</h1>
+            <p class="lead">중요한 링크를 저장해두고, 나중에 볼 수 있는 공간입니다.</p>
+            <hr class="my-4">
+            <p class="lead">
+                <button id="posting-box-btn" onclick="openClose()" class="btn btn-primary btn-lg" type="button">포스팅 박스 닫기</button>
+            </p>
+        </div>
+        <div id="post-box" class="posting-box">
+            <div class="form-group">
+                <label for="abc">아티클 URL</label>
+                <input id="url-post" type="url" class="form-control" id="exampleInputEmail1"
+                    aria-describedby="emailHelp" placeholder="">
+            </div>
+            <div class="form-group">
+                <label for="abcd">간단코멘트</label>
+                <input id="comment-post" type="text" class="form-control" id="exampleInputPassword1" placeholder="">
+            </div>
+            <button onclick="postArticle()" type="button" class="btn btn-primary">기사저장</button>
+        </div>
+    </div>
+    <div id="cards-box" class="card-columns">
+        <!-- <div class="card">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRa-4sjQfUxbPGQW2EtJji6zBiNHFixmZpJ4fAvgQ7tKQ&s"class="card-img-top" alt="card-img-cap">
+            <div class="card-body">
+            <p class="card-title">제목자리</p>
+            <p class="card-text">desc자리</p>
+            <p class="card-comment">코멘트 넣을 자리</p>
+            </div>
+        </div> -->
+    </div>
+
+
+</body>
+
+</html>
